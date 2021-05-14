@@ -22,6 +22,23 @@ router.get("/add/", async function (req, res, next) {
   return res.render("customer_new_form.html");
 });
 
+/** Show the top 10 customers */
+router.get("/top", async function (req, res, next) {
+  const customers = await Customer.topCustomers();
+  return res.render("customer_top.html", { customers });
+});
+
+
+/** Search for customers via search bar */
+// TODO case for if user submits empty form
+router.get("/customers", async function (req, res, next) {
+  const searchTerms = req.query.q;
+  // console.log("query-->", query)
+  const customers = await Customer.search(searchTerms);
+  console.log("customers from search-->", customers)
+  return res.render("customer_list.html", { customers });
+});
+
 /** Handle adding a new customer. */
 
 router.post("/add/", async function (req, res, next) {

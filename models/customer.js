@@ -31,6 +31,40 @@ class Customer {
     return results.rows.map(c => new Customer(c));
   }
 
+  /** find all customers that match a search query */
+  static async search(searchTerms) {
+    let results;
+    if(searchTerms.split(" ").length === 1){
+      results = await db.query(
+            `SELECT id,
+                    first_name AS "firstName",
+                    last_name  AS "lastName",
+                    phone,
+                    notes
+             FROM customers
+             WHERE first_name ILIKE $1
+                OR last_name ILIKE $1
+             ORDER BY last_name, first_name`,
+             [`%${searchTerms}%`]
+      );
+    } else {
+      let terms = searchTerms.split(" ");
+        results = await db.query(
+          `SELECT id,
+                  first_name AS "firstName",
+                  last_name  AS "lastName",
+                  phone,
+                  notes
+           FROM customers
+           WHERE first_name ILIKE $1
+              AND last_name ILIKE $2
+           ORDER BY last_name, first_name`,
+           [`%${terms[0]}%`, `%${terms[1]}%`]
+    );
+    }
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get a customer by ID. */
 
   static async get(id) {
@@ -54,6 +88,23 @@ class Customer {
     }
 
     return new Customer(customer);
+  }
+
+  static async topCustomers(){
+    let results = await db.query(
+      `SELECT customers.first_name AS "firstName",
+              customers.last_name AS "lastName",
+              customers.phone,
+              customers.notes,
+              customers.id,
+              COUNT(reservations.customer_id) as count
+       FROM customers
+       JOIN reservations ON customers.id = reservations.customer_id
+       GROUP BY customers.id
+       ORDER BY COUNT(reservations.customer_id) DESC
+       LIMIT 10;`
+    )
+    return results.rows.map(c => new Customer(c));
   }
 
   /** get all reservations for this customer. */
@@ -91,6 +142,7 @@ class Customer {
     }
   }
 
+  /** returns the full name of a customer */
   fullName() {
     return `${this.firstName} ${this.lastName}`
   }
