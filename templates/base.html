@@ -37,11 +37,19 @@
           <a class="nav-link" href="/top/">Top Customers</a>
         </li>
         <li>
-          <form class="navbar-form navbar-right" action="/customers">
-            <input name="q" class="form-control" placeholder="Search Lunchly" aria-label="Search" id="search">
-            <button class="btn btn-default">
+          <form class="navbar-form navbar-right form-inline" action="/customers">
+            <input 
+              name="q" 
+              class="form-control" 
+              
+              aria-label="Search" 
+              id="search" 
+              value="{{searchTerms}}"
+              placeholder="Search Lunchly" 
+            >
+            <button style="display:inline;" class="btn btn-default">
               <!-- TODO add icon to search -->
-              <span class=""></span>
+              <i class="fa fa-search"></i>
             </button>
           </form>
         </li>

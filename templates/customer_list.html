@@ -3,14 +3,17 @@
 {% block content %}
 
   <a class="btn btn-primary" style="float: right" href="/add/">Add a Customer</a>
-
+  {% if pageTitle %}
+  <h1>{{pageTitle}}</h1>
+  {% else %}
   <h1>Customers</h1>
+  {% endif %}
 
   <ul style="column-count: 4">
     {% for customer in customers %}
       <li>
         <a href="/{{ customer.id }}/">
-          {{ customer.fullName()}}
+          {{ customer.fullName}}
         </a>
       </li>
     {% endfor %}

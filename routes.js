@@ -29,14 +29,23 @@ router.get("/top", async function (req, res, next) {
 });
 
 
-/** Search for customers via search bar */
-// TODO case for if user submits empty form
+/** Search for customers via search bar 
+ * if no search term provided, show message prompt
+ * otherwise show results and the original query
+*/
 router.get("/customers", async function (req, res, next) {
+  let pageTitle;
+  if (!req.query.q) {
+    let customers = [];
+    pageTitle = "You must enter a search term"
+    return res.render("customer_list.html", { customers, pageTitle });
+  }
+
   const searchTerms = req.query.q;
-  // console.log("query-->", query)
+  pageTitle = `Search Results for: ${searchTerms}`
   const customers = await Customer.search(searchTerms);
   console.log("customers from search-->", customers)
-  return res.render("customer_list.html", { customers });
+  return res.render("customer_list.html", { customers, searchTerms, pageTitle });
 });
 
 /** Handle adding a new customer. */
@@ -87,7 +96,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   const startAt = new Date(req.body.startAt);
   const numGuests = req.body.numGuests;
   const notes = req.body.notes;
-
+  console.log("notes --->", typeof notes);
   const reservation = new Reservation({
     customerId,
     startAt,

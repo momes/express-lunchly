@@ -6,6 +6,8 @@ const moment = require("moment");
 
 const db = require("../db");
 
+const { BadRequestError } = require("../expressError.js");
+
 /** A reservation for a party */
 
 class Reservation {
@@ -18,9 +20,11 @@ class Reservation {
   }
 
   /** formatter for startAt */
-
-  getFormattedStartAt() {
-    return moment(this.startAt).format("MMMM Do YYYY, h:mm a");
+  get startAt() {
+    return this._startAt;
+  }
+  set startAt(val) {
+    this._startAt = moment(val).format("MMMM Do YYYY, h:mm a");
   }
 
   /** given a customer id, find their reservations. */
@@ -39,7 +43,33 @@ class Reservation {
 
     return results.rows.map(row => new Reservation(row));
   }
-// TODO: doc string
+
+/**Getter for numGuests*/
+  get numGuests() {
+     return this._numGuests;
+  }
+
+/**Setter that throws an error if you try to make a reservation for fewer than 1 person. */
+  set numGuests(val) {
+    if (+val < 1)
+    throw new BadRequestError("Number of guests must be more than 0."); 
+    this._numGuests = val; 
+  }
+
+//   /**Getter for customerId*/
+//   get customerId() {
+//     return this._customerId;
+//  }
+
+// /**Setter that throws an error if you try to make a reservation for fewer than 1 person. */
+//  set customerId(val) {
+//   if (this.customerId != val) {
+//     throw new BadRequestError("Can't change customer ID."); 
+//   }
+//   this._customerId = val; 
+//  }
+
+  /** save this reservation. */
   async save() {
     if (this.id === undefined) {
       const result = await db.query(
